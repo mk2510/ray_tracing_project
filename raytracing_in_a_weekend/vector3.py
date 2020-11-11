@@ -1,4 +1,5 @@
 import math
+from rtweekend import random_double
 
 class vec3:
     def __init__(self, e0,e1,e2):
@@ -52,3 +53,12 @@ class vec3:
 
     def unit_vector(self):
         return self / self.length()
+
+def random(min=0.0,max=1.0):
+    return vec3(random_double(min, max), random_double(min,max), random_double(min, max))
+    
+def random_in_unit_sphere():
+    while True:
+        p = random(-1,1)
+        if p.length_squared() < 1:
+            return p
