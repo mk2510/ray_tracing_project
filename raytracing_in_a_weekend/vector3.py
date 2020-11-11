@@ -18,7 +18,7 @@ class vec3:
         self.e[1] - other.e[1],
         self.e[2] - other.e[2])
 
-    def __NEG__(self,other):
+    def __NEG__(self):
         return vec3(-self.e[0],-self.e[1],-self.e[2])
     
     def __truediv__(self,other):

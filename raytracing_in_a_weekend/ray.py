@@ -12,6 +12,6 @@ class ray:
         return self.direction
     
     def at(self, t):
-        return self.origin + dir * t
+        return self.origin + self.direction * t
 
     
