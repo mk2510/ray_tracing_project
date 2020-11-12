@@ -72,6 +72,12 @@ def random_in_unit_sphere():
         if p.length_squared() < 1:
             return p
 
+def random_in_unit_disk():
+    while True:
+        p = vec3(random_double(-1,1), random_double(-1,1), 0)
+        if p.length_squared() < 1:
+            return p
+
 def random_unit_vector():
     return random_in_unit_sphere().unit_vector()
 
@@ -83,3 +89,10 @@ def random_in_hemisphere(normal):
 
 def reflect(v, n):
     return v - n * v.dot(n) * 2
+
+def refract(uv, n, etai_over_etat):
+    neg_uv = uv * -1
+    cos_theta = min(neg_uv.dot(n) , 1.0)
+    r_out_perp =  (uv + n * cos_theta) * etai_over_etat
+    r_out_patallel = n * (-math.sqrt(math.fabs(1.0-r_out_perp.length_squared())))
+    return r_out_perp + r_out_patallel

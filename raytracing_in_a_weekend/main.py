@@ -1,6 +1,8 @@
 import math
 import random
 
+import vector3
+from rtweekend import random_double
 import multiprocessing
 from multiprocessing import Process, Array
 from ctypes import c_char_p
@@ -14,7 +16,7 @@ from hittable_list import hit_ls
 from sphere import sphere
 from camera import camera
 
-from material import lambertian, metal
+from material import lambertian, metal, dielectric
 
  #image width
 def multi_render(return_string, id, fromI, toI, image_height, image_width ,samples_per_pixel, cam, world, max_depth):
@@ -28,6 +30,46 @@ def multi_render(return_string, id, fromI, toI, image_height, image_width ,sampl
                 pixel_color =  pixel_color + ray_color(r, world, max_depth)
 
             return_string[id] += write_color(pixel_color, samples_per_pixel)
+
+def random_scene():
+    world = []
+
+    ground_material = lambertian(vec3(0.5, 0.5, 0.5))
+    world.append(sphere(vec3(0,-1000,0), 1000, ground_material))
+
+    for a in range(-11,11,1):
+        for b in range(-11,11,1):
+            choose_mat = random.random()
+            center = vec3(a + 0.9*random.random(), 0.2, b + 0.9*random.random())
+
+            if((center - vec3(4, 0.2, 0)).length() > 0.9):
+                if (choose_mat < 0.8):
+                    #diffuse
+                    albedo = vector3.random().mult( vector3.random())
+                    sphere_material = lambertian(albedo)
+                    world.append(sphere(center, 0.2, sphere_material))
+                elif (choose_mat < 0.95):
+                    #metal
+                    albedo = vector3.random(0.5, 1)
+                    fuzz = random_double(0, 0.5)
+                    sphere_material = metal(albedo, fuzz)
+                    world.append(sphere(center, 0.2, sphere_material))
+                else:
+                    #glass
+                    sphere_material = dielectric(1.5)
+                    world.append(sphere(center, 0.2, sphere_material))
+
+    material1 = dielectric(1.5)
+    world.append(sphere(vec3(0, 1, 0), 1.0, material1))
+
+    material2 = lambertian(vec3(0.4, 0.2, 0.1))
+    world.append(sphere(vec3(-4, 1, 0), 1.0, material2))
+
+    material3 = metal(vec3(0.7, 0.6, 0.5), 0.0)
+    world.append(sphere(vec3(4, 1, 0), 1.0, material3))
+
+    return world
+
 
 def ray_color(r, world, depth):
     rec = hit_record(vec3(0,0,0), vec3(0,0,0), None, 0.0, False)
@@ -48,27 +90,23 @@ def ray_color(r, world, depth):
 if __name__ == '__main__':
 
     #Image
-    aspect_ratio = 16.0 / 9.0
-    image_width = 384 # optimised size for an 8-core CPU
+    aspect_ratio = 3.0 / 2.0
+    image_width = 1200 # optimised size for an 8-core CPU
     image_height = int(image_width / aspect_ratio)
-    samples_per_pixel = 100
+    samples_per_pixel = 500
     max_depth = 50
 
     #World
-    world = []
-
-    material_ground = lambertian(vec3(0.8, 0.8, 0.0))
-    material_center = lambertian(vec3(0.7, 0.3, 0.3))
-    material_left   = metal(vec3(0.8, 0.8, 0.8))
-    material_right  = metal(vec3(0.8, 0.6, 0.2))
-    
-    world.append(sphere(vec3( 0.0, -100.5, -1.0), 100.0, material_ground))
-    world.append(sphere(vec3( 0.0,    0.0, -1.0),   0.5, material_center))
-    world.append(sphere(vec3(-1.0,    0.0, -1.0),   0.5, material_left))
-    world.append(sphere(vec3( 1.0,    0.0, -1.0),   0.5, material_right))
+    world = random_scene()
 
     # camera
-    cam = camera()
+    lookfrom = vec3(13,2,3)
+    lookat = vec3(0,0,0)
+    vup = vec3(0,1,0)
+    dist_to_focus = 10.0
+    aperture = 0.1
+
+    cam = camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus)
 
 
     # render
