@@ -5,9 +5,10 @@ from hittable import hit_record
 from hittable import hittable
 
 class sphere(hittable):
-    def __init__(self, cen = None, r = None):
+    def __init__(self, cen = None, r = None, m = None):
         self.center = cen
         self.radius = r
+        self.mat_ptr = m
     
     def hit(self,r, t_min, t_max, rec):
         oc = r.origin - self.center
@@ -16,7 +17,7 @@ class sphere(hittable):
         c = oc.length_squared() - self.radius * self.radius
 
         discriminant = half_b * half_b - a*c
-        if discriminant < 0:
+        if discriminant < 0 or a == 0:
             return False
 
         sqrtd = math.sqrt(discriminant)
@@ -32,5 +33,6 @@ class sphere(hittable):
         rec.p = r.at(rec.t)
         outward_normal = (rec.p - self.center) / self.radius
         rec.set_face_normal(r, outward_normal)
+        rec.mat_ptr = self.mat_ptr
 
         return True

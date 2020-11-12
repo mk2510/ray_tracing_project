@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 
+from material import material
 from vector3 import vec3
 
 @dataclass
 class hit_record:
     p : vec3
     normal: vec3
+    mat_ptr : material 
     t: float
     front_face : bool
 

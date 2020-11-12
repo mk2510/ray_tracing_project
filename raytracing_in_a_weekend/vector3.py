@@ -30,6 +30,11 @@ class vec3:
     def __getitem__(self,other):
         return self.e[other]
 
+    def mult(self,other):
+        return vec3(self.e[0] * other[0],
+        self.e[1] * other[1],
+        self.e[2] * other[2])
+
     def x(self):
         return self.e[0]
     def y(self):
@@ -53,6 +58,10 @@ class vec3:
 
     def unit_vector(self):
         return self / self.length()
+    
+    def near_zero(self):
+        s=1e-8
+        return math.fabs(self.e[0]) < s and math.fabs(self.e[1]) < s and math.fabs(self.e[2]) < s 
 
 def random(min=0.0,max=1.0):
     return vec3(random_double(min, max), random_double(min,max), random_double(min, max))
@@ -62,3 +71,15 @@ def random_in_unit_sphere():
         p = random(-1,1)
         if p.length_squared() < 1:
             return p
+
+def random_unit_vector():
+    return random_in_unit_sphere().unit_vector()
+
+def random_in_hemisphere(normal):
+    in_unit_sphere = random_in_unit_sphere()
+    if in_unit_sphere.dot(normal) > 0.0:
+        return in_unit_sphere
+    return in_unit_sphere * -1
+
+def reflect(v, n):
+    return v - n * v.dot(n) * 2
