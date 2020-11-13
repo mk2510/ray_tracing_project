@@ -8,6 +8,7 @@ from multiprocessing import Process, Array
 from ctypes import c_char_p
 from moving_sphere import moving_sphere
 
+from texture import checker_texture, solid_color
 from color import write_color
 from vector3 import vec3, random_in_hemisphere
 from ray import ray
@@ -32,11 +33,21 @@ def multi_render(return_string, id, fromI, toI, image_height, image_width ,sampl
 
             return_string[id] += write_color(pixel_color, samples_per_pixel)
 
+def two_spheres():
+    objects = []
+
+    checker = checker_texture(solid_color(vec3(0.2, 0.3, 0.1)), solid_color(vec3(0.9, 0.9, 0.9)))
+
+    objects.append(sphere(vec3(0,-10, 0), 10, lambertian(checker)))
+    objects.append(sphere(vec3(0, 10, 0), 10, lambertian(checker)))
+
+    return objects
+
 def random_scene():
     world = []
 
-    ground_material = lambertian(vec3(0.5, 0.5, 0.5))
-    world.append(sphere(vec3(0,-1000,0), 1000, ground_material))
+    checker = checker_texture(solid_color(vec3(0.2, 0.3, 0.1)), vec3(0.9, 0.9, 0.9))
+    world.append(sphere(vec3(0,-1000,0), 1000, lambertian(checker)))
 
     for a in range(-11,11,1):
         for b in range(-11,11,1):
@@ -98,16 +109,26 @@ if __name__ == '__main__':
     samples_per_pixel = 50
     max_depth = 50
 
-    #World
-    world = random_scene()
+
+    aperture = 0.0
+    #World + cam 1
+    '''world = random_scene()
 
     # camera
     lookfrom = vec3(13,2,3)
     lookat = vec3(0,0,0)
+    
+    aperture = 0.1'''
+    #World + cam 2:
+    world = two_spheres()
+    lookfrom = vec3(13,2,3)
+    lookat = vec3(0,0,0)
+    vfov = 20.0
+    
+
+    #standart cam
     vup = vec3(0,1,0)
     dist_to_focus = 10.0
-    aperture = 0.1
-
     cam = camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0)
 
 

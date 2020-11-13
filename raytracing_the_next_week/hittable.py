@@ -9,6 +9,8 @@ class hit_record:
     normal: vec3
     mat_ptr : material 
     t: float
+    u: float
+    v: float
     front_face : bool
 
     def set_face_normal(self,r, outward_normal):

@@ -4,6 +4,7 @@ from vector3 import vec3
 from hittable import hit_record
 from hittable import hittable
 from aabb import aabb
+from rtweekend import pi
 
 class sphere(hittable):
     def __init__(self, cen = None, r = None, m = None):
@@ -34,6 +35,7 @@ class sphere(hittable):
         rec.p = r.at(rec.t)
         outward_normal = (rec.p - self.center) / self.radius
         rec.set_face_normal(r, outward_normal)
+        rec.u, rec.v = get_sphere_uv(outward_normal)
         rec.mat_ptr = self.mat_ptr
 
         return True
@@ -41,3 +43,9 @@ class sphere(hittable):
     def bounding_box(self, time0, time1):
         return True, aabb(self.center - vec3(self.radius, self.radius,self.radius), 
                             self.center + vec3(self.radius, self.radius,self.radius))
+
+def get_sphere_uv( p):
+        theta = math.acos(p.y() * -1)
+        phi = math.atan2(p.z() * -1, p.x()) + pi
+
+        return phi / (2*pi) , theta / pi

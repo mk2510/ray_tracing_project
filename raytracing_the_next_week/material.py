@@ -19,7 +19,7 @@ class lambertian(material):
             scatter_direction = rec.normal
 
         scattered = ray(rec.p, scatter_direction, r_in.time)
-        attenuation = self.albedo
+        attenuation = self.albedo.value(rec.u, rec.v, rec.p)
         return True, scattered, attenuation
 
 class metal(material):
