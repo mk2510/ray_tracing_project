@@ -4,7 +4,7 @@ from vector3 import vec3
 
 class texture:
     def value(self,u, v, p):
-        return 0
+        return None
 
 class solid_color(texture):
     

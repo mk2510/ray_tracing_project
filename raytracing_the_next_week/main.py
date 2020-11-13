@@ -8,6 +8,7 @@ from multiprocessing import Process, Array
 from ctypes import c_char_p
 from moving_sphere import moving_sphere
 
+from aarect import xy_rect
 from texture import checker_texture, solid_color, noise_texture
 from color import write_color
 from vector3 import vec3, random_in_hemisphere
@@ -18,10 +19,10 @@ from hittable_list import hit_ls
 from sphere import sphere
 from camera import camera
 
-from material import lambertian, metal, dielectric
+from material import lambertian, metal, dielectric, diffuse_light
 
  #image width
-def multi_render(return_string, id, fromI, toI, image_height, image_width ,samples_per_pixel, cam, world, max_depth):
+def multi_render(return_string, id, fromI, toI, image_height, image_width ,samples_per_pixel, cam, world, max_depth, background):
     for j in range( toI  , fromI -1,-1):
         for i in range(0,image_width):
             pixel_color = vec3(0,0,0)
@@ -29,7 +30,7 @@ def multi_render(return_string, id, fromI, toI, image_height, image_width ,sampl
                 u = (i + random.random()) / (image_width-1)
                 v = (j + random.random()) / (image_height-1)
                 r = cam.get_ray(u, v)
-                pixel_color =  pixel_color + ray_color(r, world, max_depth)
+                pixel_color =  pixel_color + ray_color(r, background, world, max_depth)
 
             return_string[id] += write_color(pixel_color, samples_per_pixel)
 
@@ -42,6 +43,17 @@ def two_perlin_spheres():
 
     return objects
 
+def simple_light():
+    objects = []
+
+    pertext = noise_texture(4)
+    objects.append(sphere(vec3(0,-1000,0), 1000, lambertian(pertext)))
+    objects.append(sphere(vec3(0,2,0), 2, lambertian(pertext)))
+
+    difflight = diffuse_light(solid_color(vec3(4,4,4)))
+    objects.append(xy_rect(3, 5, 1, 3, -2, difflight))
+
+    return objects
 
 
 def two_spheres():
@@ -95,21 +107,28 @@ def random_scene():
     return world
 
 
-def ray_color(r, world, depth):
+def ray_color(r,background, world, depth):
     rec = hit_record(vec3(0,0,0), vec3(0,0,0), None, 0.0, 0.0, 0.0, False)
 
     if depth <= 0:
         return vec3(0,0,0)
 
     hit_anything, rec = hit_ls(world, r, 0.001, rtweekend.infinity, rec)
-    if hit_anything:
-       scat, scattered, attenuation = rec.mat_ptr.scatter(r,rec)
-       if scat:
-           return  ray_color(scattered, world,depth-1).mult(attenuation)
-       return vec3(0,0,0)
-    unit_direction = r.get_direction().unit_vector()
-    t = 0.5 * (unit_direction.y() + 1.0)
-    return vec3(1,1,1)*(1-t) + vec3(0.5,0.7,1.0)*t
+    if not hit_anything:
+      return background
+    
+    emitted = rec.mat_ptr.emitted(rec.u, rec.v, rec.p)
+    bool, scatter, attenuation = rec.mat_ptr.scatter(r,rec)
+    if not bool:
+        return emitted
+    
+    rc = ray_color(scatter,background, world, depth-1)
+    if isinstance(rc, (int, float)):
+        return emitted + attenuation * rc
+    if isinstance(attenuation, (int,float)):
+        return emitted + rc * attenuation
+    
+    return emitted + rc.mult(attenuation)
 
 if __name__ == '__main__':
 
@@ -122,24 +141,38 @@ if __name__ == '__main__':
 
 
     aperture = 0.0
+    background = vec3(0,0,0)
     #World + cam 1
     '''world = random_scene()
 
     # camera
+    background = vec3(0.70, 0.80, 1.00)
+
     lookfrom = vec3(13,2,3)
     lookat = vec3(0,0,0)
     
     aperture = 0.1'''
     #World + cam 2:
     '''world = two_spheres()
+    background = vec3(0.70, 0.80, 1.00)
     lookfrom = vec3(13,2,3)
     lookat = vec3(0,0,0)
     vfov = 20.0'''
     
     #World + cam 3
-    world = two_perlin_spheres()
+    '''world = two_perlin_spheres()
     lookfrom = vec3(13,2,3)
     lookat = vec3(0,0,0)
+    background = vec3(0.70, 0.80, 1.00)
+    vfov = 20.0'''
+
+
+    #World + cam 5
+    background = vec3(0, 0, 0)
+    world = simple_light()
+    samples_per_pixel = 400
+    lookfrom = vec3(26,3,6)
+    lookat = vec3(0,2,0)
     vfov = 20.0
 
     #standart cam
@@ -160,7 +193,7 @@ if __name__ == '__main__':
 
     for i in range(number_of_cores):
         return_str[i] = ''
-        process.append(Process(target = multi_render, args=(return_str,i,int(i*image_height/number_of_cores), int((i+1)*image_height/number_of_cores), image_height, image_width,samples_per_pixel, cam, world, max_depth),))
+        process.append(Process(target = multi_render, args=(return_str,i,int(i*image_height/number_of_cores), int((i+1)*image_height/number_of_cores), image_height, image_width,samples_per_pixel, cam, world, max_depth, background),))
         process[i].start()
     
     for i in range(number_of_cores):

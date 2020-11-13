@@ -5,6 +5,9 @@ import random
 import math
 
 class material:
+    def emitted(self,u,v,p):
+        return vec3(0,0,0)
+
     def scatter(self,r_in, rec):
         return False, ray(vec3(0,0,0), vec3(0,0,0)), 0.0
 
@@ -60,3 +63,14 @@ def _reflectance(cosine, ref_idx):
     r0 = (1-ref_idx) / (1+ref_idx)
     r0 *= r0
     return r0 + (1-r0) * math.pow(1-cosine, 5)
+
+
+class diffuse_light(material):
+    def __init__(self, a):
+        self.emit = a
+
+    def scatter(self, r_in, rec):
+        return False, None, None
+
+    def emitted(self,u,v,p):
+       return self.emit.value(u,v,p)
