@@ -6,6 +6,7 @@ from rtweekend import random_double
 import multiprocessing
 from multiprocessing import Process, Array
 from ctypes import c_char_p
+from moving_sphere import moving_sphere
 
 from color import write_color
 from vector3 import vec3, random_in_hemisphere
@@ -47,7 +48,8 @@ def random_scene():
                     #diffuse
                     albedo = vector3.random().mult( vector3.random())
                     sphere_material = lambertian(albedo)
-                    world.append(sphere(center, 0.2, sphere_material))
+                    center2 = center + vec3(0, random_double(0,0.5), 0)
+                    world.append(moving_sphere(center, center2, 0.0, 1.0, 0.2, sphere_material))
                 elif (choose_mat < 0.95):
                     #metal
                     albedo = vector3.random(0.5, 1)
@@ -90,7 +92,7 @@ def ray_color(r, world, depth):
 if __name__ == '__main__':
 
     #Image
-    aspect_ratio = 3.0 / 2.0
+    aspect_ratio = 16.0 / 9.0
     image_width = 384 # optimised size for an 8-core CPU
     image_height = int(image_width / aspect_ratio)
     samples_per_pixel = 50
@@ -106,7 +108,7 @@ if __name__ == '__main__':
     dist_to_focus = 10.0
     aperture = 0.1
 
-    cam = camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus)
+    cam = camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0)
 
 
     # render
