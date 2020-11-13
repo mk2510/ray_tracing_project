@@ -32,4 +32,4 @@ class noise_texture(texture):
     def __init__(self):
         self.noise = perlin()
     def value(self, u, v, p):
-        return vec3(1,1,1).mult( self.noise.noise(p))
+        return vec3(1,1,1) * self.noise.noise(p)

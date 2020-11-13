@@ -96,7 +96,7 @@ def random_scene():
 
 
 def ray_color(r, world, depth):
-    rec = hit_record(vec3(0,0,0), vec3(0,0,0), None, 0.0, False)
+    rec = hit_record(vec3(0,0,0), vec3(0,0,0), None, 0.0, 0.0, 0.0, False)
 
     if depth <= 0:
         return vec3(0,0,0)

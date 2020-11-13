@@ -31,9 +31,9 @@ class perlin:
             
 
     def noise(self,p):
-        i = (4*p.x()) & 255
-        j = (4*p.y()) & 255
-        k = (4*p.z()) & 255
+        i = int((4*p.x())) & 255
+        j = int(4*p.y()) & 255
+        k = int(4*p.z()) & 255
 
-        return self.ranfloat[self.perm_x[i] ^ self.perm_y[j] ^ self.perm_z[k]]
+        return self.ranfloat[int(self.perm_x[i]) ^ int(self.perm_y[j]) ^ int(self.perm_z[k])]
         
