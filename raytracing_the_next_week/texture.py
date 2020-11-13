@@ -1,4 +1,6 @@
 import math
+from perlin import perlin
+from vector3 import vec3
 
 class texture:
     def value(self,u, v, p):
@@ -24,3 +26,10 @@ class checker_texture(texture):
                 return self.odd.value(u, v, p)
             else:
                 return self.even.value(u, v, p)
+
+class noise_texture(texture):
+
+    def __init__(self):
+        self.noise = perlin()
+    def value(self, u, v, p):
+        return vec3(1,1,1).mult( self.noise.noise(p))

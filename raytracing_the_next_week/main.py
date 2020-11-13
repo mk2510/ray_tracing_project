@@ -8,7 +8,7 @@ from multiprocessing import Process, Array
 from ctypes import c_char_p
 from moving_sphere import moving_sphere
 
-from texture import checker_texture, solid_color
+from texture import checker_texture, solid_color, noise_texture
 from color import write_color
 from vector3 import vec3, random_in_hemisphere
 from ray import ray
@@ -32,6 +32,17 @@ def multi_render(return_string, id, fromI, toI, image_height, image_width ,sampl
                 pixel_color =  pixel_color + ray_color(r, world, max_depth)
 
             return_string[id] += write_color(pixel_color, samples_per_pixel)
+
+def two_perlin_spheres():
+    objects = []
+
+    pertext = noise_texture()
+    objects.append(sphere(vec3(0,-1000,0), 1000, lambertian(pertext)))
+    objects.append(sphere(vec3(0, 2, 0), 2,lambertian(pertext)))
+
+    return objects
+
+
 
 def two_spheres():
     objects = []
@@ -120,11 +131,16 @@ if __name__ == '__main__':
     
     aperture = 0.1'''
     #World + cam 2:
-    world = two_spheres()
+    '''world = two_spheres()
+    lookfrom = vec3(13,2,3)
+    lookat = vec3(0,0,0)
+    vfov = 20.0'''
+    
+    #World + cam 3
+    world = two_perlin_spheres()
     lookfrom = vec3(13,2,3)
     lookat = vec3(0,0,0)
     vfov = 20.0
-    
 
     #standart cam
     vup = vec3(0,1,0)
