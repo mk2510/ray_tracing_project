@@ -36,7 +36,7 @@ def multi_render(return_string, id, fromI, toI, image_height, image_width ,sampl
 def two_perlin_spheres():
     objects = []
 
-    pertext = noise_texture()
+    pertext = noise_texture(4)
     objects.append(sphere(vec3(0,-1000,0), 1000, lambertian(pertext)))
     objects.append(sphere(vec3(0, 2, 0), 2,lambertian(pertext)))
 
