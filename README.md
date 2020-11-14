@@ -5,5 +5,5 @@ Pythonimplementation of the book [raytracing in one weekend](https://raytracing.
 The raytracer is simply started by calling:
 
 ```python
-python3 main.py
+>>> python3 main.py
 ```
