@@ -2,7 +2,8 @@ Pythonimplementation of the book [raytracing in one weekend](https://raytracing.
 
 ![](https://github.com/mk2510/ray_tracing_project/blob/main/image.jpg)
 
-The raytracer is simply started by calling
-'''python
-python3 main.py
-'''
+The raytracer is simply started by calling:
+
+```python
+>>> python3 main.py
+```
