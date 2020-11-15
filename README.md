@@ -12,6 +12,6 @@ The book "raytracing the next week" is also implemented here in python in a sepe
 
 ![](https://github.com/mk2510/ray_tracing_project/blob/main/image2.jpg)
 
-Finally the famous Cornellbox is implemented withhin world 5
+Finally the famous Cornellbox is implemented withhin world 6
 
 ![](https://github.com/mk2510/ray_tracing_project/blob/main/image3.jpg)
