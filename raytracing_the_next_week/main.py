@@ -8,7 +8,7 @@ from multiprocessing import Process, Array
 from ctypes import c_char_p
 from moving_sphere import moving_sphere
 
-from aarect import xy_rect
+from aarect import xy_rect, xz_rect, yz_rect
 from texture import checker_texture, solid_color, noise_texture
 from color import write_color
 from vector3 import vec3, random_in_hemisphere
@@ -52,8 +52,32 @@ def simple_light():
 
     difflight = diffuse_light(solid_color(vec3(4,4,4)))
     objects.append(xy_rect(3, 5, 1, 3, -2, difflight))
+    objects.append(xz_rect(3,5,3,5,2,difflight))
 
     return objects
+
+def cornell_box():
+    objects = []
+
+    
+    red = lambertian(solid_color(vec3(0.65, 0.05, 0.05)))
+    white = lambertian(solid_color(vec3(0.73, 0.73, 0.73)))
+    green = lambertian(solid_color(vec3(0.12, 0.45, 0.15)))
+
+    '''red   = lambertian(vec3(0.65, 0.05, 0.05))
+    white = lambertian(vec3(0.73, 0.73, 0.73))
+    green = lambertian(vec3(0.12, 0.45, 0.15))'''
+    light = diffuse_light(solid_color(vec3(15, 15, 15)))
+
+    objects.append(yz_rect(0, 555, 0, 555, 555, green))
+    objects.append(yz_rect(0, 555, 0, 555, 0, red))
+    objects.append(xz_rect(213, 343, 227, 332, 554, light))
+    objects.append(xz_rect(0, 555, 0, 555, 0, white))
+    objects.append(xz_rect(0, 555, 0, 555, 555, white))
+    objects.append(xy_rect(0, 555, 0, 555, 555, white))
+
+    return objects
+
 
 
 def two_spheres():
@@ -136,7 +160,7 @@ if __name__ == '__main__':
     aspect_ratio = 16.0 / 9.0
     image_width = 384 # optimised size for an 8-core CPU
     image_height = int(image_width / aspect_ratio)
-    samples_per_pixel = 50
+    samples_per_pixel = 200
     max_depth = 50
 
 
@@ -168,17 +192,28 @@ if __name__ == '__main__':
 
 
     #World + cam 5
-    background = vec3(0, 0, 0)
+    '''background = vec3(0, 0, 0)
     world = simple_light()
-    samples_per_pixel = 400
+    samples_per_pixel = 20
     lookfrom = vec3(26,3,6)
     lookat = vec3(0,2,0)
-    vfov = 20.0
+    vfov = 20.0'''
+
+    #World + cam 6
+    world = cornell_box()
+    aspect_ratio = 1.0
+    image_width = 384
+    image_height = 384
+    samples_per_pixel = 200
+    background = vec3(0,0,0)
+    lookfrom = vec3(278, 278, -800)
+    lookat = vec3(278, 278, 0)
+    vfov = 40.0
 
     #standart cam
     vup = vec3(0,1,0)
     dist_to_focus = 10.0
-    cam = camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0)
+    cam = camera(lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0)
 
 
     # render
